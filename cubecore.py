@@ -145,7 +145,7 @@ def formLine(x1, y1, z1, x2, y2, z2):
   zDifferencePerStep = abs(z1 - z2) / linelength
 
   for i in range(0, linelength):
-    setLedState(x1 + xDifferencePerStep * (i - 1), y1 + yDifferencePerStep * (i - 1), z1 + zDifferencePerStep * (i - 1)), True)
+    setLedState(int(rand(x1 + xDifferencePerStep * (i - 1), 0)), int(rand(y1 + yDifferencePerStep * (i - 1), 0)), int(rand(z1 + zDifferencePerStep * (i - 1),0)), True)
   return
 
 def formRect(x1, y1, z1, x2, y2, z2):
@@ -195,7 +195,7 @@ def randomize(ledsAtOnce, ticksBetweenChange, duration):
         leds[randx][randy][randz] = True
 
     waitTicks(ticksBetweenChange)
-    
+
   clearCube()
 
 def testrun(runs, timePerLed):
