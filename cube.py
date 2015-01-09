@@ -6,13 +6,13 @@ import RPi.GPIO as GPIO
 from collections import defaultdict
 from random import randint
 from cubecore import *
-from cubeconfig import *
 
-def tree(): return defaultdict(tree)
 
 print "starting script."
 
 setup()
+
+testrun(1, 10)
 
 formCube(1, 1, 1, 3, 3, 3)
 waitTicks(10)
@@ -31,7 +31,9 @@ waitTicks(10)
 formCube(1, 1, 1, 3, 2, 3)
 waitTicks(10)
 formCube(1, 1, 1, 3, 3, 3)
-waitTicks(100)
+waitTicks(30)
+
+randomize(3, 5, 100)
 
 GPIO.cleanup()
 
