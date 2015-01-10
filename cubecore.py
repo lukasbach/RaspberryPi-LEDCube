@@ -23,8 +23,9 @@ pinconfig = {
 }
 
 # Timing configuration
-ledtime = 0.0001
+ledtime = 0.005
 constantTickTime = True
+tickThroughLayers = True
 
 # LED Config
 def tree(): return defaultdict(tree)
@@ -109,6 +110,38 @@ def ledTick():
       time.sleep(ledtime)
   return
 
+def layerTick():
+  for z in range(1, 5):
+    # get layer pin for current layer
+    layerpin = pinconfig[getLayerName(x, y, z)]
+
+    # set layer low
+    GPIO.output(layerpin, GPIO.LOW)
+
+    for y in range(1, 5):
+      for z in range(1, 5):
+        # Get pins for tower config
+        towerpin = pinconfig[getTowerName(x, y, z)]
+
+          if layerpin != False and towerpin != False:
+            # set tower high
+            GPIO.output(towerpin, GPIO.HIGH)
+
+    time.sleep(ledtime)
+
+    for y in range(1, 5):
+      for z in range(1, 5):
+        # Get pins for tower config
+        towerpin = pinconfig[getTowerName(x, y, z)]
+
+          if layerpin != False and towerpin != False:
+            # set tower low
+            GPIO.output(towerpin, GPIO.LOW)
+
+    # set layer high
+    GPIO.output(layerpin, GPIO.HIGH)
+  return
+
 def setLedState(x, y, z, val):
   leds[x][y][z] = val
   return
@@ -134,18 +167,21 @@ def setup():
 
 def waitTicks(ticks):
   for i in range(0, ticks):
-    ledTick()
+    if tickThroughLayers:
+      layerTick()
+    else:
+      ledTick()
 
 
 # FORMS
 def formLine(x1, y1, z1, x2, y2, z2):
-  linelength = round(math.sqrt(abs(x1 - x2) * abs(x1 - x2) + abs(y1 - y2) * abs(y1 - y2) + abs(z1 - z2) * abs(z1 - z2)))
+  linelength = int(round(math.sqrt(abs(x1 - x2) * abs(x1 - x2) + abs(y1 - y2) * abs(y1 - y2) + abs(z1 - z2) * abs(z1 - z2))))
   xDifferencePerStep = abs(x1 - x2) / linelength
   yDifferencePerStep = abs(y1 - y2) / linelength
   zDifferencePerStep = abs(z1 - z2) / linelength
 
   for i in range(0, linelength):
-    setLedState(int(rand(x1 + xDifferencePerStep * (i - 1), 0)), int(rand(y1 + yDifferencePerStep * (i - 1), 0)), int(rand(z1 + zDifferencePerStep * (i - 1),0)), True)
+    setLedState(int(round(x1 + xDifferencePerStep * (i - 1), 0)), int(round(y1 + yDifferencePerStep * (i - 1), 0)), int(round(z1 + zDifferencePerStep * (i - 1),0)), True)
   return
 
 def formRect(x1, y1, z1, x2, y2, z2):
