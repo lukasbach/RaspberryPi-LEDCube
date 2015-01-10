@@ -1,3 +1,9 @@
+import time
+import math
+import RPi.GPIO as GPIO
+from collections import defaultdict
+from random import randint
+
 # Pin Konfiguration
 pinconfig = {
     "layer1": 26,
@@ -90,7 +96,6 @@ def ledTick():
 
           if layerpin != False and towerpin != False:
             ledsActivated += 1
-            print "LED " + str(x) + str(y) + str(z) + " is currently on, using tower" + str(pinconfig[getTowerName(x, y, z)]) + " and layer" + str(pinconfig[getLayerName(x, y, z)])  
 
             # set tower high
             GPIO.output(towerpin, GPIO.HIGH)
@@ -113,30 +118,30 @@ def ledTick():
 def layerTick():
   for z in range(1, 5):
     # get layer pin for current layer
-    layerpin = pinconfig[getLayerName(x, y, z)]
+    layerpin = pinconfig[getLayerName(0, 0, z)]
 
     # set layer low
     GPIO.output(layerpin, GPIO.LOW)
 
-    for y in range(1, 5):
-      for z in range(1, 5):
+    for x in range(1, 5):
+      for y in range(1, 5):
         # Get pins for tower config
         towerpin = pinconfig[getTowerName(x, y, z)]
 
-          if layerpin != False and towerpin != False:
-            # set tower high
-            GPIO.output(towerpin, GPIO.HIGH)
+        if layerpin != False and towerpin != False and leds[x][y][z] == True:
+          # set tower high
+          GPIO.output(towerpin, GPIO.HIGH)
 
     time.sleep(ledtime)
 
-    for y in range(1, 5):
-      for z in range(1, 5):
+    for x in range(1, 5):
+      for y in range(1, 5):
         # Get pins for tower config
         towerpin = pinconfig[getTowerName(x, y, z)]
 
-          if layerpin != False and towerpin != False:
-            # set tower low
-            GPIO.output(towerpin, GPIO.LOW)
+        if layerpin != False and towerpin != False and leds[x][y][z] == True:
+          # set tower low
+          GPIO.output(towerpin, GPIO.LOW)
 
     # set layer high
     GPIO.output(layerpin, GPIO.HIGH)
@@ -175,7 +180,7 @@ def waitTicks(ticks):
 
 # FORMS
 def formLine(x1, y1, z1, x2, y2, z2):
-  linelength = int(round(math.sqrt(abs(x1 - x2) * abs(x1 - x2) + abs(y1 - y2) * abs(y1 - y2) + abs(z1 - z2) * abs(z1 - z2))))
+  linelength = int(round(math.sqrt(abs(x1 - x2) * abs(x1 - x2) + abs(y1 - y2) * abs(y1 - y2) + abs(z1 - z2) * abs(z1 - z2)))) + 1
   xDifferencePerStep = abs(x1 - x2) / linelength
   yDifferencePerStep = abs(y1 - y2) / linelength
   zDifferencePerStep = abs(z1 - z2) / linelength
@@ -220,16 +225,19 @@ def formCube(x1, y1, z1, x2, y2, z2):
 def randomize(ledsAtOnce, ticksBetweenChange, duration):
   clearCube()
 
-  for i in range(duration / ticksBetweenChange, duration):
-    while ledsAtOnce:
+  for i in range(0, duration / ticksBetweenChange):
+    claerCube()
+    ledsLeft = ledsAtOnce
+    while ledsLeft:
       randx = randint(1, 4)
       randy = randint(1, 4)
       randz = randint(1, 4)
 
       if leds[randx][randy][randz] == False:
-        ledsAtOnce -= 1
+        ledsLeft -= 1
         leds[randx][randy][randz] = True
 
+    ledsLeft = ledsAtOnce
     waitTicks(ticksBetweenChange)
 
   clearCube()
