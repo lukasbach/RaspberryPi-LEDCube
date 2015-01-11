@@ -180,13 +180,15 @@ def waitTicks(ticks):
 
 # FORMS
 def formLine(x1, y1, z1, x2, y2, z2):
-  linelength = int(round(math.sqrt(abs(x1 - x2) * abs(x1 - x2) + abs(y1 - y2) * abs(y1 - y2) + abs(z1 - z2) * abs(z1 - z2)))) + 1
-  xDifferencePerStep = abs(x1 - x2) / linelength
-  yDifferencePerStep = abs(y1 - y2) / linelength
-  zDifferencePerStep = abs(z1 - z2) / linelength
-
-  for i in range(0, linelength):
-    setLedState(int(round(x1 + xDifferencePerStep * (i - 1), 0)), int(round(y1 + yDifferencePerStep * (i - 1), 0)), int(round(z1 + zDifferencePerStep * (i - 1),0)), True)
+  if x2 != x1:   # Line goes into x direction
+    for x in range(x1, x2 + 1):
+      setLedState(x, y1, z1, True)
+  elif y2 != y1: # line goes into y direction
+    for y in range(y1, y2 + 1):
+      setLedState(x1, y, z1, True)
+  elif z2 != z1: # line goes into z direction
+    for z in range(z1, z2 + 1):
+      setLedState(x1, y1, z, True)
   return
 
 def formRect(x1, y1, z1, x2, y2, z2):
