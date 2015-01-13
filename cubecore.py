@@ -228,7 +228,7 @@ def randomize(ledsAtOnce, ticksBetweenChange, duration):
   clearCube()
 
   for i in range(0, duration / ticksBetweenChange):
-    claerCube()
+    clearCube()
     ledsLeft = ledsAtOnce
     while ledsLeft:
       randx = randint(1, 4)
@@ -271,3 +271,50 @@ def testrun(runs, timePerLed):
       setLedState(x, y, z, False)
 
   clearCube()
+
+def waveCube(times):
+  # initiate temorary array for all towers
+  towerData = tree()
+  for x in range(1, 5):
+    for y in range(1, 5):
+      towerData[x][y][height] = 0
+      towerData[x][y][direction] = "waiting"
+
+  # starting led
+  towerData[1][1][direction] = "up"
+  towerData[1][1][height] = 1
+
+  while times:
+    for x in range(1, 5):
+      for y in range(1, 5):
+        # If led hits top
+        if towerData[x][y][direction] == "up" and towerData[x][y][height] == 4:
+          towerData[x][y][direction] = "down"
+          towerData[x][y][height] -= 1
+        # if led hits bottom
+        elif towerData[x][y][direction] == "down" and towerData[x][y][height] == 0:
+          towerData[x][y][direction] = "waiting"
+        # led going down
+        elif towerData[x][y][direction] == "down" and towerData[x][y][height] > 0:
+          towerData[x][y][height] -= 1
+        # led going up
+        elif towerData[x][y][direction] == "up" and towerData[x][y][height] < 4 and towerData[x][y][height] != 1:
+          towerData[x][y][height] += 1
+        # led at the beginning going up (and pulling leds next to it up as well)
+        elif towerData[x][y][direction] == "up" and towerData[x][y][height] == 1:
+          towerData[x][y][height] += 1
+          if x == 4 and y == 4:
+            # initiate new loop
+            times -= 1
+            towerData[1][1][direction] = "up"
+            towerData[1][1][height] = 1
+          else:
+            # raise leds next to this one
+            towerData[x + 1][y][direction] = "up"
+            towerData[x + 1][y][height] = 1
+            towerData[x][y + 1][direction] = "up"
+            towerData[x][y + 1][height] = 1
+
+
+
+    
